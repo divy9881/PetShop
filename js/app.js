@@ -3,7 +3,13 @@ var bodyParser = require("body-parser")
 var expressSanitizer = require("express-sanitizer")
 var mongoose = require("mongoose")
 var methodOverride = require("method-override")
+var passport = require("passport")
+var passportLocal = require("passport-local")
+var passportLocalMongoose = require("passport-local-mongoose")
+var expressSession = require("express-session")
+var connectFlash = require("connect-flash")
 var Pet = require("./Pet.js")
+var User = require("./User.js")
 
 var app = express()
 
@@ -12,9 +18,30 @@ app.set("views","./ejs")
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(expressSanitizer())
 app.use(methodOverride("_method"))
+app.use(connectFlash())
 
 app.use(express.static("./css"))
 app.use(express.static("./js"))
+
+passport.use(new passportLocal(User.authenticate()))
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+app.use(expressSession({
+	secret:"qwerty",
+	resave:false,
+	saveUninitialized:false
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.use(function(req,res,next){
+	res.locals.user = req.user
+	console.log(req.user)
+	console.log(res.locals)
+	next()
+})
 
 mongoose.connect("mongodb://localhost:27017/petshop",{useNewUrlParser:true})
 
@@ -107,6 +134,43 @@ app.delete("/petshop/delete/:id",function(req,res){
 		}
 	})
 })
+
+app.get("/login",function(req,res){
+	res.render("login.ejs")
+})
+
+app.get("/signup",function(req,res){
+	res.render("register.ejs")
+})
+
+app.get("/logout",function(req,res){
+	req.logout()
+	res.redirect("/petshop")
+})
+
+app.post("/signup",function(req,res){
+	User.register(new User({username:req.body.username}),req.body.password,function(err,user){
+		if(err)
+		{
+			console.log(err)
+			res.redirect("/signup")
+		}
+		else{
+			passport.authenticate("local")(req,res,function(){
+				res.redirect("/petshop")
+			})
+		}
+	})
+})
+
+app.post("/login",passport.authenticate("local",{
+	successRedirect:"/petshop",
+	failureRedirect:"/login"
+}),function(req,res){
+	console.log(req.user)
+	//res.redirect("/petshop")
+})
+
 server = app.listen(process.env.PORT,process.env.IP,function(){
 	console.log("Server is Running ...")
 	console.log(server.address().port+" "+server.address().address)

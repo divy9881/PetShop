@@ -1,0 +1,21 @@
+.container{
+	margin-top:100px;
+}
+.form-horizontal{
+	padding-top:100px;
+}
+label{
+	font-size:1.4em;
+}
+.form-group{
+	padding:10px;
+	text-align:center
+}
+.signup{
+	padding-top:10px;
+	padding-bottom:10px;
+	font-size:1.2em;
+}
+.back{
+	font-size:2em;
+}
