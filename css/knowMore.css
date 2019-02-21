@@ -1,0 +1,26 @@
+.container{
+	margin-top:80px;
+}
+.thumbnail{
+	text-align:center
+}
+.caption{
+	font-size:2em;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+.details{
+	margin-bottom:0;
+	font-size:1.3em;
+	text-align:justify
+}
+.edit, .delete{
+	margin:10px;
+}
+#del{
+	display:inline-block;
+}
+.back{
+	font-size:2em;
+}
+

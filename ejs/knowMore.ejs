@@ -1,0 +1,32 @@
+<% include header.ejs %>
+	<script>
+		function Confirm(){
+			var r = confirm("Are you sure, you want to delete this content?")
+			return r;
+		}
+	</script>
+	<link rel="stylesheet" href="/knowMore.css"/>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 side-nav">
+				<a href="/petshop"><button class="btn btn-primary back"><i class="fas fa-arrow-circle-left"></i></button></a>
+			</div>
+			<div class="col-lg-9 info">
+				<div class="thumbnail">
+					<img src="<%= Pet.photo %>">
+					<div class="caption">
+						<p><%= Pet.name %> (<%= Pet.animal %> - <%= Pet.breed %>)</p>
+					</div>
+					<div class="well well-sm details">
+						<p><%= Pet.details %></p>
+					</div>
+					<a href="/petshop/edit/<%= Pet._id %>"><button class="btn btn-primary edit">EDIT</button></a>
+					<form action="/petshop/delete/<%= Pet._id %>?_method=DELETE" method="POST" id="del" onsubmit="return Confirm()">
+						<button class="btn btn-danger delete" type="submit" >DELETE</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+<% include footer.ejs %>

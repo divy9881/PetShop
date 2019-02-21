@@ -1,0 +1,42 @@
+<% include header.ejs %>
+
+	<link rel="stylesheet" href="/editPet.css"/>
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3">
+			</div>
+			<div class="col-lg-6">
+				<a href="/petshop/know/<%= Pet._id %>"><button class="btn btn-primary back"><i class="fas fa-arrow-circle-left"></i></button></a>
+				<form action="/petshop/edit/<%= Pet._id %>?_method=PUT" method="POST">
+					<div class="form-group">
+						<label for="name">NAME:</label>
+						<input type="text" class="form-control input-lg" name="name" placeholder="Enter name" id="name" value="<%= Pet.name %>"/>
+					</div>
+					<div class="form-group">
+						<label for="animal">ANIMAL:</label>
+						<input type="text" class="form-control input-lg" name="animal" placeholder="Enter animal" id="animal" value="<%= Pet.animal %>"/>
+					</div>
+					<div class="form-group">
+						<label for="breed">BREED:</label>
+						<input type="text" class="form-control input-lg" name="breed" placeholder="Enter breed" id="breed" value="<%= Pet.breed %>"/>
+					</div>
+					<div class="form-group">
+						<label for="photo">PHOTO:</label>
+						<input type="text" class="form-control input-lg" placeholder="Enter photo" name="photo" id="photo" value="<%= Pet.photo %>"/>
+					</div>
+					<div class="form-group">
+						<label for="detail">DETAILS:</label>
+						<textarea class="form-control" rows="10" placeholder="Enter details" name="details" id="details"><%= Pet.details %></textarea>
+					</div>
+					<div class="add-btn">
+						<button type="submit" class="btn btn-primary btn-lg">UPDATE</button>
+					</div>
+				</form>
+			</div>
+			<div class="col-lg-3">
+			</div>
+		</div>
+	</div>
+	
+<% include footer.ejs %>

@@ -1,0 +1,28 @@
+<% include header.ejs %>
+
+	<link rel="stylesheet" href="/petshop.css" />
+	
+	<div class="container">
+		<div class="jumbotron petshop-title">
+			<h1><i class="fas fa-paw"></i> PET SHOP!</h1>
+			<p>Perfect shop for lovely pets.</p>
+			<p><a class="btn btn-primary btn-lg" href="/petshop/new" role="button">ADD NEW PETS</a></p>
+		</div>
+		
+		<div class="row">
+			<% Pets.forEach(function(pet){ %>
+				<div class="col-lg-3 col-md-4 col-sm-6 Flex" >
+					<div class="thumbnail">
+						<img src="<%= pet.photo %>"/>
+						<div class="caption">
+							<p><strong><%= pet.name %></strong></p>
+							<p>(<%= pet.animal %> - <%= pet.breed %>)</p>
+							<a href="/petshop/know/<%= pet._id %>"><button type="button" class="btn btn-primary">KNOW MORE</button></a>
+						</div>
+					</div>
+				</div>
+			<% }) %>
+		</div>
+	</div>
+	
+<% include footer.ejs %>

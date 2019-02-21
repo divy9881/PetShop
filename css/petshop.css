@@ -1,0 +1,16 @@
+.container{
+	margin-top:80px;
+}
+.petshop-title{
+	text-align:center;
+}
+.caption{
+	font-size:1.3em;
+	text-align:center;
+}
+.Flex{
+	display:flex;
+}
+.caption p{
+	text-transform:uppercase;
+}
