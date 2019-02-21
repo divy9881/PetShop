@@ -10,6 +10,7 @@
 }
 .Flex{
 	display:flex;
+	flex-wrap:wrap;
 }
 .caption p{
 	text-transform:uppercase;

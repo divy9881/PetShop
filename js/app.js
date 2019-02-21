@@ -103,7 +103,7 @@ app.delete("/petshop/delete/:id",function(req,res){
 			console.log(err)
 		}
 		else{
-			res.redirect()
+			res.redirect("/petshop")
 		}
 	})
 })
