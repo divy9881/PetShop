@@ -42,7 +42,7 @@ app.use(function(req,res,next){
 	next()
 })
 
-mongoose.connect("mongodb://localhost:27017/petshop",{useNewUrlParser:true})
+mongoose.connect(process.env.PETSHOPDATA,{useNewUrlParser:true})
 
 app.get("/",function(req,res){
 	res.render("home.ejs",{Failure:req.flash("failure")[0]})
