@@ -3,6 +3,11 @@
 	<link rel="stylesheet" href="/register.css"/>
 	
 	<div class="container">
+		<% if(Failure){ %>
+			<div class="well well-sm danger">
+				<%= Failure %>
+			</div>
+		<% } %>
 		<div class="row">
 			<div class="col-lg-3">
 			</div>

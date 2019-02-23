@@ -19,3 +19,9 @@ label{
 .back{
 	font-size:2em;
 }
+.danger{
+	background-color:#ffb3b3;
+	text-align:center;
+	font-size:1.1em;
+	font-weight:bold;
+}

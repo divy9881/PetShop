@@ -10,6 +10,7 @@ var expressSession = require("express-session")
 var connectFlash = require("connect-flash")
 var Pet = require("./Pet.js")
 var User = require("./User.js")
+var Comment = require("./Comment.js")
 
 var app = express()
 
@@ -44,7 +45,7 @@ app.use(function(req,res,next){
 mongoose.connect("mongodb://localhost:27017/petshop",{useNewUrlParser:true})
 
 app.get("/",function(req,res){
-	res.render("home.ejs")
+	res.render("home.ejs",{Failure:req.flash("failure")[0]})
 })
 
 app.get("/petshop",function(req,res){
@@ -53,16 +54,16 @@ app.get("/petshop",function(req,res){
 			conole.log(err)
 		}
 		else{
-			res.render("petshop.ejs",{Pets:Pets})
+			res.render("petshop.ejs",{Pets:Pets,Failure:req.flash("error")[0],Success:req.flash("success")[0]})
 		}
 	})
 })
 
 app.get("/petshop/new",isLoggedIn,function(req,res){
-	res.render("newPets.ejs")
+	res.render("newPets.ejs",{Failure:req.flash("error")[0]})
 })
 
-app.post("/petshop/new",function(req,res){
+app.post("/petshop/new",isLoggedIn,function(req,res){
 	sanitize = req.sanitize
 	Pet.create({
 		name:sanitize(req.body.name),
@@ -76,37 +77,56 @@ app.post("/petshop/new",function(req,res){
 			console.log(err)
 		}
 		else{
-			console.log(Pet)
 			res.redirect("/petshop")
 		}
 	})
 })
 
 app.get("/petshop/know/:id",function(req,res){
-	Pet.findById(req.params.id,function(err,Pet){
+	Pet.findOne({_id:req.params.id}).populate([
+		{path:"author"},
+		{path:"comments",
+		 populate:{path:"comments"}
+		 }
+	]).exec(function(err,pet){
 		if(err)
 		{
 			console.log(err)
 		}
-		else{
-			res.render("knowMore.ejs",{Pet:Pet})
+		else
+		{
+			let CommentAuthors = []
+			if(pet.comments.length!=0){
+				pet.comments.forEach(function(comment){
+					User.findById(comment.author,function(err,User){
+						CommentAuthors.push(User.username)
+						if(pet.comments.length == CommentAuthors.length)
+						{
+							res.render("knowMore.ejs",{Pet:pet,CUsers:CommentAuthors,Failure:req.flash("error")})
+						}
+					})
+				})
+			}
+			else{
+				res.render("knowMore.ejs",{Pet:pet,CUsers:CommentAuthors,Failure:req.flash("error")[0]})
+			}
 		}
 	})
 })
 
-app.get("/petshop/edit/:id",function(req,res){
+app.get("/petshop/edit/:id",isLoggedIn,function(req,res){
 	Pet.findById(req.params.id,function(err,pet){
 		if(err)
 		{
 			console.log(err)
 		}
 		else{
-			res.render("editPet.ejs",{Pet:pet})
+			res.render("editPet.ejs",{Pet:pet,Failure:req.flash("error")[0]})
 		}
 	})
 })
 
-app.put("/petshop/edit/:id",function(req,res){
+app.put("/petshop/edit/:id",isLoggedIn,function(req,res){
 	sanitize = req.sanitize
 	Pet.findByIdAndUpdate(req.params.id,{
 		name:sanitize(req.body.name),
@@ -125,31 +145,68 @@ app.put("/petshop/edit/:id",function(req,res){
 	})
 })
 
-app.delete("/petshop/delete/:id",function(req,res){
-	Pet.findByIdAndRemove(req.params.id,function(err,Pet){
+app.delete("/petshop/delete/:id",isLoggedIn,function(req,res){
+	Pet.findById(req.params.id,function(err,pet){
 		if(err){
 			console.log(err)
 		}
-		else{
-			res.redirect("/petshop")
+		else if(toString(req.user._id) == toString(pet.author)){
+			Pet.deleteOne(pet,function(err){
+				if(err)
+				{
+					console.log(err)
+				}
+				else
+				{
+					res.redirect("/petshop")
+				}
+			})
+		}
+		else
+		{
+			res.redirect("/")
 		}
 	})
 })
 
-app.get("/login",function(req,res){
-	res.render("login.ejs")
+app.put("/petshop/comment/:id",isLoggedIn,function(req,res){
+	var sanitize = req.sanitize
+	Pet.findById(req.params.id,function(err,Pet){
+		var comment = new Comment({
+			Comment:sanitize(req.body.comment),
+			author:req.user
+		})
+		Comment.create(comment,function(err,comment){
+			Pet.comments.push(comment)
+			Pet.save(function(err,Pet){
+				if(err)
+				{
+					console.log(err)
+				}
+				else
+				{
+					res.redirect("/petshop/know/"+req.params.id)
+				}
+			})
+		})		
+	})
 })
 
-app.get("/signup",function(req,res){
-	res.render("register.ejs")
+app.get("/login",isLoggedOut,function(req,res){
+	res.render("login.ejs",{Failure:req.flash("error")[0]})
 })
 
-app.get("/logout",function(req,res){
+app.get("/signup",isLoggedOut,function(req,res){
+	res.render("register.ejs",{Failure:req.flash("error")[0]})
+})
+
+app.get("/logout",isLoggedIn,function(req,res){
 	req.logout()
+	req.flash("success","Logged You out.")
 	res.redirect("/petshop")
 })
 
-app.post("/signup",function(req,res){
+app.post("/signup",isLoggedOut,function(req,res){
 	User.register(new User({username:req.body.username}),req.body.password,function(err,user){
 		if(err)
 		{
@@ -158,15 +215,18 @@ app.post("/signup",function(req,res){
 		}
 		else{
 			passport.authenticate("local")(req,res,function(){
+				req.flash("success","Registered successfully")
 				res.redirect("/petshop")
 			})
 		}
 	})
 })
 
-app.post("/login",passport.authenticate("local",{
+app.post("/login",isLoggedOut,passport.authenticate("local",{
 	successRedirect:"/petshop",
-	failureRedirect:"/login"
+	failureRedirect:"/login",
+	failureFlash:"Cannot login you",
+	successFlash:"Successfully Logged you in"
 }),function(req,res){
 })
 
@@ -175,7 +235,18 @@ function isLoggedIn(req,res,next){
 		next()
 	}
 	else{
+		req.flash("error","Login Required.")
 		res.redirect("/login")
+	}
+}
+
+function isLoggedOut(req,res,next){
+	if(!req.user){
+		next()
+	}
+	else{
+		req.flash(failure,"Logout Required.")
+		res.redirect("/petshop")
 	}
 }
 

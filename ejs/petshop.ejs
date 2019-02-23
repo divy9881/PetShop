@@ -3,11 +3,22 @@
 	<link rel="stylesheet" href="/petshop.css" />
 	
 	<div class="container">
+		<% if(Failure){ %>
+			<div class="well well-sm danger">
+				<%= Failure %>
+			</div>
+		<% } %>
+		<% if(Success){ %>
+			<div class="well well-sm success">
+				<%= Success %>
+			</div>
+		<% } %>
 		<div class="jumbotron petshop-title">
 			<h1><i class="fas fa-paw"></i> PET SHOP!</h1>
 			<p>Perfect shop for lovely pets.</p>
 			<p><a class="btn btn-primary btn-lg" href="/petshop/new" role="button">ADD NEW PETS</a></p>
 		</div>
+		<hr>
 		<div class="row">
 			<% Pets.forEach(function(pet){ %>
 				<div class="col-lg-3 col-md-4 col-sm-6 Flex" >
@@ -19,6 +30,7 @@
 							<a href="/petshop/know/<%= pet._id %>"><button type="button" class="btn btn-primary">KNOW MORE</button></a>
 						</div>
 					</div>
+					<hr>
 				</div>
 			<% }) %>
 		</div>
