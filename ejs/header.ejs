@@ -28,7 +28,7 @@
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			  <ul class="nav navbar-nav navbar-right">
 				<% if(user) {%>
-					<li><a href="#"><%= user.username %></a></li>
+					<li><a href="#"><strong><%= user.username %></strong></a></li>
 					<li><a href="/logout">LOGOUT <i class="fas fa-sign-out-alt"></i></a></li>
 				<% } %>
 				<% if(!user){ %>

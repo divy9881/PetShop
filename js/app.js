@@ -38,8 +38,6 @@ app.use(passport.session())
 
 app.use(function(req,res,next){
 	res.locals.user = req.user
-	console.log(req.user)
-	console.log(res.locals)
 	next()
 })
 
@@ -60,7 +58,7 @@ app.get("/petshop",function(req,res){
 	})
 })
 
-app.get("/petshop/new",function(req,res){
+app.get("/petshop/new",isLoggedIn,function(req,res){
 	res.render("newPets.ejs")
 })
 
@@ -71,13 +69,14 @@ app.post("/petshop/new",function(req,res){
 		animal:sanitize(req.body.animal),
 		breed:sanitize(req.body.breed),
 		photo:sanitize(req.body.photo),
-		details:sanitize(req.body.details)
+		details:sanitize(req.body.details),
+		author:req.user
 	},function(err,Pet){
-		if(err)
-		{
+		if(err){
 			console.log(err)
 		}
 		else{
+			console.log(Pet)
 			res.redirect("/petshop")
 		}
 	})
@@ -85,7 +84,8 @@ app.post("/petshop/new",function(req,res){
 
 app.get("/petshop/know/:id",function(req,res){
 	Pet.findById(req.params.id,function(err,Pet){
-		if(err){
+		if(err)
+		{
 			console.log(err)
 		}
 		else{
@@ -113,7 +113,8 @@ app.put("/petshop/edit/:id",function(req,res){
 		animal:sanitize(req.body.animal),
 		breed:sanitize(req.body.breed),
 		photo:sanitize(req.body.photo),
-		details:sanitize(req.body.details)
+		details:sanitize(req.body.details),
+		author:req.user
 	},function(err,Pet){
 		if(err){
 			console.log(err)
@@ -167,9 +168,16 @@ app.post("/login",passport.authenticate("local",{
 	successRedirect:"/petshop",
 	failureRedirect:"/login"
 }),function(req,res){
-	console.log(req.user)
-	//res.redirect("/petshop")
 })
+
+function isLoggedIn(req,res,next){
+	if(req.user){
+		next()
+	}
+	else{
+		res.redirect("/login")
+	}
+}
 
 server = app.listen(process.env.PORT,process.env.IP,function(){
 	console.log("Server is Running ...")

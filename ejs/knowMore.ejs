@@ -20,10 +20,12 @@
 					<div class="well well-sm details">
 						<p><%= Pet.details %></p>
 					</div>
-					<a href="/petshop/edit/<%= Pet._id %>"><button class="btn btn-primary edit">EDIT</button></a>
-					<form action="/petshop/delete/<%= Pet._id %>?_method=DELETE" method="POST" id="del" onsubmit="return Confirm()">
-						<button class="btn btn-danger delete" type="submit" >DELETE</button>
-					</form>
+					<% if( toString(user._id) == toString(Pet.author._id) ){ %>
+						<a href="/petshop/edit/<%= Pet._id %>"><button class="btn btn-primary edit">EDIT</button></a>
+						<form action="/petshop/delete/<%= Pet._id %>?_method=DELETE" method="POST" id="del" onsubmit="return Confirm()">
+							<button class="btn btn-danger delete" type="submit" >DELETE</button>
+						</form>
+					<% } %>
 				</div>
 			</div>
 		</div>
