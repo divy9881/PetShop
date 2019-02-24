@@ -37,7 +37,7 @@
 						<p class="content-author"><i class="fas fa-user-tag"></i><em> <%= Pet.author.username %></em></p>
 					</div>
 					<% if(user != undefined){ %>
-						<% if( toString(user._id) == toString(Pet.author._id) ){ %>
+						<% if( user._id.toString() == Pet.author._id.toString() ){ %>
 							<a href="/petshop/edit/<%= Pet._id %>"><button class="btn btn-primary edit">EDIT</button></a>
 							<form action="/petshop/delete/<%= Pet._id %>?_method=DELETE" method="POST" id="del" onsubmit="return Confirm()">
 								<button class="btn btn-danger delete" type="submit" >DELETE</button>
